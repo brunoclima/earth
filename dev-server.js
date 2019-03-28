@@ -27,26 +27,28 @@ function cacheControl() {
 }
 
 function logger() {
-    express.logger.token("date", function() {
+    morgan.token("date", function() {
         return new Date().toISOString();
     });
-    express.logger.token("response-all", function(req, res) {
+    morgan.token("response-all", function(req, res) {
         return (res._header ? res._header : "").trim();
     });
-    express.logger.token("request-all", function(req, res) {
+    morgan.token("request-all", function(req, res) {
         return util.inspect(req.headers);
     });
-    return express.logger(
+    return morgan(
         ':date - info: :remote-addr :req[cf-connecting-ip] :req[cf-ipcountry] :method :url HTTP/:http-version ' +
         '":user-agent" :referrer :req[cf-ray] :req[accept-encoding]\\n:request-all\\n\\n:response-all\\n');
 }
 
 var port = process.argv[2];
 var express = require("express");
+var morgan = require("morgan");
+var compression = require("compression");
 var app = express();
 
 app.use(cacheControl());
-app.use(express.compress({filter: compressionFilter}));
+app.use(compression({filter: compressionFilter}));
 app.use(logger());
 app.use(express.static("public"));
 

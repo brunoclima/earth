@@ -11,7 +11,7 @@ var µ = function() {
 
     var τ = 2 * Math.PI;
     var H = 0.0000360;  // 0.0000360°φ ~= 4m
-    var DEFAULT_CONFIG = "current/wind/surface/level/orthographic";
+    var DEFAULT_CONFIG = "current/wind/surface/level/mercator";
     var TOPOLOGY = isMobile() ? "/data/earth-topo-mobile.json?v2" : "/data/earth-topo.json?v2";
 
     /**
@@ -526,7 +526,7 @@ var µ = function() {
                 param: tokens[6],            // non-empty alphanumeric _
                 surface: tokens[7],          // non-empty alphanumeric _
                 level: tokens[8],            // non-empty alphanumeric _
-                projection: "orthographic",
+                projection: "equirectangular",
                 orientation: "",
                 topology: TOPOLOGY,
                 overlayType: "default",

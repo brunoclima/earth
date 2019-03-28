@@ -9,9 +9,9 @@
 (function() {
     "use strict";
 
-    var SECOND = 1000;
-    var MINUTE = 60 * SECOND;
-    var HOUR = 60 * MINUTE;
+    // var SECOND = 1000;
+    // var MINUTE = 60 * SECOND;
+    // var HOUR = 60 * MINUTE;
     var MAX_TASK_TIME = 100;                  // amount of time before a task yields control (millis)
     var MIN_SLEEP_TIME = 25;                  // amount of time a task waits before resuming (millis)
     var MIN_MOVE = 4;                         // slack before a drag operation beings (pixels)
@@ -154,7 +154,7 @@
                     signalEnd();
                 }
                 op = null;  // the drag/zoom/click operation is over
-            });
+            }).scaleExtent([1, Infinity]);
 
         var signalEnd = _.debounce(function() {
             if (!op || op.type !== "drag" && op.type !== "zoom") {
@@ -164,20 +164,20 @@
         }, MOVE_END_WAIT);  // wait for a bit to decide if user has stopped moving the globe
 
         d3.select("#display").call(zoom);
-        d3.select("#show-location").on("click", function() {
-            if (navigator.geolocation) {
-                report.status("Finding current position...");
-                navigator.geolocation.getCurrentPosition(function(pos) {
-                    report.status("");
-                    var coord = [pos.coords.longitude, pos.coords.latitude], rotate = globe.locate(coord);
-                    if (rotate) {
-                        globe.projection.rotate(rotate);
-                        configuration.save({orientation: globe.orientation()});  // triggers reorientation
-                    }
-                    dispatch.trigger("click", globe.projection(coord), coord);
-                }, log.error);
-            }
-        });
+        // d3.select("#show-location").on("click", function() {
+        //     if (navigator.geolocation) {
+        //         report.status("Finding current position...");
+        //         navigator.geolocation.getCurrentPosition(function(pos) {
+        //             report.status("");
+        //             var coord = [pos.coords.longitude, pos.coords.latitude], rotate = globe.locate(coord);
+        //             if (rotate) {
+        //                 globe.projection.rotate(rotate);
+        //                 configuration.save({orientation: globe.orientation()});  // triggers reorientation
+        //             }
+        //             dispatch.trigger("click", globe.projection(coord), coord);
+        //         }, log.error);
+        //     }
+        // });
 
         function reorient() {
             var options = arguments[3] || {};
@@ -266,16 +266,16 @@
     /**
      * Modifies the configuration to navigate to the chronologically next or previous data layer.
      */
-    function navigate(step) {
-        if (downloadsInProgress > 0) {
-            log.debug("Download in progress--ignoring nav request.");
-            return;
-        }
-        var next = gridAgent.value().primaryGrid.navigate(step);
-        if (next) {
-            configuration.save(µ.dateToConfig(next));
-        }
-    }
+    // function navigate(step) {
+    //     if (downloadsInProgress > 0) {
+    //         log.debug("Download in progress--ignoring nav request.");
+    //         return;
+    //     }
+    //     var next = gridAgent.value().primaryGrid.navigate(step);
+    //     if (next) {
+    //         configuration.save(µ.dateToConfig(next));
+    //     }
+    // }
 
     function buildRenderer(mesh, globe) {
         if (!mesh || !globe) return null;
@@ -373,7 +373,7 @@
         var context = globe.defineMask(canvas.getContext("2d"));
         context.fillStyle = "rgba(255, 0, 0, 1)";
         context.fill();
-        // d3.select("#display").node().appendChild(canvas);  // make mask visible for debugging
+        // d3.select("#display").node().appendChild(canvas);   // make mask visible for debugging
 
         var imageData = context.getImageData(0, 0, width, height);
         var data = imageData.data;  // layout: [r, g, b, a, r, g, b, a, ...]
@@ -662,7 +662,7 @@
         var ctx = d3.select("#overlay").node().getContext("2d"), grid = (gridAgent.value() || {}).overlayGrid;
 
         µ.clearCanvas(d3.select("#overlay").node());
-        µ.clearCanvas(d3.select("#scale").node());
+        // µ.clearCanvas(d3.select("#scale").node());
         if (overlayType) {
             if (overlayType !== "off") {
                 ctx.putImageData(field.overlay, 0, 0);
@@ -672,23 +672,23 @@
 
         if (grid) {
             // Draw color bar for reference.
-            var colorBar = d3.select("#scale"), scale = grid.scale, bounds = scale.bounds;
-            var c = colorBar.node(), g = c.getContext("2d"), n = c.width - 1;
-            for (var i = 0; i <= n; i++) {
-                var rgb = scale.gradient(µ.spread(i / n, bounds[0], bounds[1]), 1);
-                g.fillStyle = "rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ")";
-                g.fillRect(i, 0, 1, c.height);
-            }
+            // var colorBar = d3.select("#scale"), scale = grid.scale, bounds = scale.bounds;
+            // var c = colorBar.node(), g = c.getContext("2d"), n = c.width - 1;
+            // for (var i = 0; i <= n; i++) {
+            //     var rgb = scale.gradient(µ.spread(i / n, bounds[0], bounds[1]), 1);
+            //     g.fillStyle = "rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ")";
+            //     g.fillRect(i, 0, 1, c.height);
+            // }
 
-            // Show tooltip on hover.
-            colorBar.on("mousemove", function() {
-                var x = d3.mouse(this)[0];
-                var pct = µ.clamp((Math.round(x) - 2) / (n - 2), 0, 1);
-                var value = µ.spread(pct, bounds[0], bounds[1]);
-                var elementId = grid.type === "wind" ? "#location-wind-units" : "#location-value-units";
-                var units = createUnitToggle(elementId, grid).value();
-                colorBar.attr("title", µ.formatScalar(value, units) + " " + units.label);
-            });
+            // // Show tooltip on hover.
+            // colorBar.on("mousemove", function() {
+            //     var x = d3.mouse(this)[0];
+            //     var pct = µ.clamp((Math.round(x) - 2) / (n - 2), 0, 1);
+            //     var value = µ.spread(pct, bounds[0], bounds[1]);
+            //     var elementId = grid.type === "wind" ? "#location-wind-units" : "#location-value-units";
+            //     var units = createUnitToggle(elementId, grid).value();
+            //     colorBar.attr("title", µ.formatScalar(value, units) + " " + units.label);
+            // });
         }
     }
 
@@ -697,47 +697,47 @@
      * UNDONE: if the grids hold unloaded products, then the date can be extracted from them.
      *         This function would simplify nicely.
      */
-    function validityDate(grids) {
-        // When the active layer is considered "current", use its time as now, otherwise use current time as
-        // now (but rounded down to the nearest three-hour block).
-        var THREE_HOURS = 3 * HOUR;
-        var now = grids ? grids.primaryGrid.date.getTime() : Math.floor(Date.now() / THREE_HOURS) * THREE_HOURS;
-        var parts = configuration.get("date").split("/");  // yyyy/mm/dd or "current"
-        var hhmm = configuration.get("hour");
-        return parts.length > 1 ?
-            Date.UTC(+parts[0], parts[1] - 1, +parts[2], +hhmm.substring(0, 2)) :
-            parts[0] === "current" ? now : null;
-    }
+    // function validityDate(grids) {
+    //     // When the active layer is considered "current", use its time as now, otherwise use current time as
+    //     // now (but rounded down to the nearest three-hour block).
+    //     var THREE_HOURS = 3 * HOUR;
+    //     var now = grids ? grids.primaryGrid.date.getTime() : Math.floor(Date.now() / THREE_HOURS) * THREE_HOURS;
+    //     var parts = configuration.get("date").split("/");  // yyyy/mm/dd or "current"
+    //     var hhmm = configuration.get("hour");
+    //     return parts.length > 1 ?
+    //         Date.UTC(+parts[0], parts[1] - 1, +parts[2], +hhmm.substring(0, 2)) :
+    //         parts[0] === "current" ? now : null;
+    // }
 
     /**
      * Display the grid's validity date in the menu. Allow toggling between local and UTC time.
      */
-    function showDate(grids) {
-        var date = new Date(validityDate(grids)), isLocal = d3.select("#data-date").classed("local");
-        var formatted = isLocal ? µ.toLocalISO(date) : µ.toUTCISO(date);
-        d3.select("#data-date").text(formatted + " " + (isLocal ? "Local" : "UTC"));
-        d3.select("#toggle-zone").text("⇄ " + (isLocal ? "UTC" : "Local"));
-    }
+    // function showDate(grids) {
+    //     var date = new Date(validityDate(grids)), isLocal = d3.select("#data-date").classed("local");
+    //     var formatted = isLocal ? µ.toLocalISO(date) : µ.toUTCISO(date);
+    //     d3.select("#data-date").text(formatted + " " + (isLocal ? "Local" : "UTC"));
+    //     d3.select("#toggle-zone").text("⇄ " + (isLocal ? "UTC" : "Local"));
+    // }
 
     /**
      * Display the grids' types in the menu.
      */
-    function showGridDetails(grids) {
-        showDate(grids);
-        var description = "", center = "";
-        if (grids) {
-            var langCode = d3.select("body").attr("data-lang") || "en";
-            var pd = grids.primaryGrid.description(langCode), od = grids.overlayGrid.description(langCode);
-            description = od.name + od.qualifier;
-            if (grids.primaryGrid !== grids.overlayGrid) {
-                // Combine both grid descriptions together with a " + " if their qualifiers are the same.
-                description = (pd.qualifier === od.qualifier ? pd.name : pd.name + pd.qualifier) + " + " + description;
-            }
-            center = grids.overlayGrid.source;
-        }
-        d3.select("#data-layer").text(description);
-        d3.select("#data-center").text(center);
-    }
+    // function showGridDetails(grids) {
+    //     // showDate(grids);
+    //     var description = "", center = "";
+    //     if (grids) {
+    //         var langCode = d3.select("body").attr("data-lang") || "en";
+    //         var pd = grids.primaryGrid.description(langCode), od = grids.overlayGrid.description(langCode);
+    //         description = od.name + od.qualifier;
+    //         if (grids.primaryGrid !== grids.overlayGrid) {
+    //             // Combine both grid descriptions together with a " + " if their qualifiers are the same.
+    //             description = (pd.qualifier === od.qualifier ? pd.name : pd.name + pd.qualifier) + " + " + description;
+    //         }
+    //         center = grids.overlayGrid.source;
+    //     }
+    //     d3.select("#data-layer").text(description);
+    //     d3.select("#data-center").text(center);
+    // }
 
     /**
      * Constructs a toggler for the specified product's units, storing the toggle state on the element having
@@ -888,18 +888,18 @@
         d3.selectAll(".fill-screen").attr("width", view.width).attr("height", view.height);
         // Adjust size of the scale canvas to fill the width of the menu to the right of the label.
         var label = d3.select("#scale-label").node();
-        d3.select("#scale")
-            .attr("width", (d3.select("#menu").node().offsetWidth - label.offsetWidth) * 0.97)
-            .attr("height", label.offsetHeight / 2);
+        // d3.select("#scale")
+        //     .attr("width", (d3.select("#menu").node().offsetWidth - label.offsetWidth) * 0.97)
+        //     .attr("height", label.offsetHeight / 2);
 
-        d3.select("#show-menu").on("click", function() {
-            if (µ.isEmbeddedInIFrame()) {
-                window.open("http://earth.nullschool.net/" + window.location.hash, "_blank");
-            }
-            else {
-                d3.select("#menu").classed("invisible", !d3.select("#menu").classed("invisible"));
-            }
-        });
+        // d3.select("#show-menu").on("click", function() {
+        //     if (µ.isEmbeddedInIFrame()) {
+        //         window.open("http://earth.nullschool.net/" + window.location.hash, "_blank");
+        //     }
+        //     else {
+        //         d3.select("#menu").classed("invisible", !d3.select("#menu").classed("invisible"));
+        //     }
+        // });
 
         if (µ.isFF()) {
             // Workaround FF performance issue of slow click behavior on map having thick coastlines.
@@ -934,9 +934,9 @@
             var changed = _.keys(configuration.changedAttributes()), rebuildRequired = false;
 
             // Build a new grid if any layer-related attributes have changed.
-            if (_.intersection(changed, ["date", "hour", "param", "surface", "level"]).length > 0) {
-                rebuildRequired = true;
-            }
+            // if (_.intersection(changed, ["date", "hour", "param", "surface", "level"]).length > 0) {
+            //     rebuildRequired = true;
+            // }
             // Build a new grid if the new overlay type is different from the current one.
             var overlayType = configuration.get("overlayType") || "default";
             if (_.indexOf(changed, "overlayType") >= 0 && overlayType !== "off") {
@@ -945,26 +945,26 @@
                     // Do a rebuild if we have no overlay grid.
                     rebuildRequired = true;
                 }
-                else if (overlay.type !== overlayType && !(overlayType === "default" && primary === overlay)) {
-                    // Do a rebuild if the types are different.
-                    rebuildRequired = true;
-                }
+                // else if (overlay.type !== overlayType && !(overlayType === "default" && primary === overlay)) {
+                //     // Do a rebuild if the types are different.
+                //     rebuildRequired = true;
+                // }
             }
 
             if (rebuildRequired) {
                 gridAgent.submit(buildGrids);
             }
         });
-        gridAgent.on("submit", function() {
-            showGridDetails(null);
-        });
-        gridAgent.on("update", function(grids) {
-            showGridDetails(grids);
-        });
-        d3.select("#toggle-zone").on("click", function() {
-            d3.select("#data-date").classed("local", !d3.select("#data-date").classed("local"));
-            showDate(gridAgent.cancel.requested ? null : gridAgent.value());
-        });
+        // gridAgent.on("submit", function() {
+        //     showGridDetails(null);
+        // });
+        // gridAgent.on("update", function(grids) {
+        //     showGridDetails(grids);
+        // });
+        // d3.select("#toggle-zone").on("click", function() {
+        //     d3.select("#data-date").classed("local", !d3.select("#data-date").classed("local"));
+        //     showDate(gridAgent.cancel.requested ? null : gridAgent.value());
+        // });
 
         function startRendering() {
             rendererAgent.submit(buildRenderer, meshAgent.value(), globeAgent.value());
@@ -1010,86 +1010,86 @@
         d3.select("#location-close").on("click", _.partial(clearLocationDetails, true));
 
         // Modify menu depending on what mode we're in.
-        configuration.on("change:param", function(context, mode) {
-            d3.selectAll(".ocean-mode").classed("invisible", mode !== "ocean");
-            d3.selectAll(".wind-mode").classed("invisible", mode !== "wind");
-            switch (mode) {
-                case "wind":
-                    d3.select("#nav-backward-more").attr("title", "-1 Day");
-                    d3.select("#nav-backward").attr("title", "-3 Hours");
-                    d3.select("#nav-forward").attr("title", "+3 Hours");
-                    d3.select("#nav-forward-more").attr("title", "+1 Day");
-                    break;
-                case "ocean":
-                    d3.select("#nav-backward-more").attr("title", "-1 Month");
-                    d3.select("#nav-backward").attr("title", "-5 Days");
-                    d3.select("#nav-forward").attr("title", "+5 Days");
-                    d3.select("#nav-forward-more").attr("title", "+1 Month");
-                    break;
-            }
-        });
+        // configuration.on("change:param", function(context, mode) {
+        //     d3.selectAll(".ocean-mode").classed("invisible", mode !== "ocean");
+        //     d3.selectAll(".wind-mode").classed("invisible", mode !== "wind");
+        //     switch (mode) {
+        //         case "wind":
+        //             d3.select("#nav-backward-more").attr("title", "-1 Day");
+        //             d3.select("#nav-backward").attr("title", "-3 Hours");
+        //             d3.select("#nav-forward").attr("title", "+3 Hours");
+        //             d3.select("#nav-forward-more").attr("title", "+1 Day");
+        //             break;
+        //         case "ocean":
+        //             d3.select("#nav-backward-more").attr("title", "-1 Month");
+        //             d3.select("#nav-backward").attr("title", "-5 Days");
+        //             d3.select("#nav-forward").attr("title", "+5 Days");
+        //             d3.select("#nav-forward-more").attr("title", "+1 Month");
+        //             break;
+        //     }
+        // });
 
         // Add handlers for mode buttons.
-        d3.select("#wind-mode-enable").on("click", function() {
-            if (configuration.get("param") !== "wind") {
-                configuration.save({param: "wind", surface: "surface", level: "level", overlayType: "default"});
-            }
-        });
-        configuration.on("change:param", function(x, param) {
-            d3.select("#wind-mode-enable").classed("highlighted", param === "wind");
-        });
-        d3.select("#ocean-mode-enable").on("click", function() {
-            if (configuration.get("param") !== "ocean") {
-                // When switching between modes, there may be no associated data for the current date. So we need
-                // find the closest available according to the catalog. This is not necessary if date is "current".
-                // UNDONE: this code is annoying. should be easier to get date for closest ocean product.
-                var ocean = {param: "ocean", surface: "surface", level: "currents", overlayType: "default"};
-                var attr = _.clone(configuration.attributes);
-                if (attr.date === "current") {
-                    configuration.save(ocean);
-                }
-                else {
-                    when.all(products.productsFor(_.extend(attr, ocean))).spread(function(product) {
-                        if (product.date) {
-                            configuration.save(_.extend(ocean, µ.dateToConfig(product.date)));
-                        }
-                    }).otherwise(report.error);
-                }
-                stopCurrentAnimation(true);  // cleanup particle artifacts over continents
-            }
-        });
-        configuration.on("change:param", function(x, param) {
-            d3.select("#ocean-mode-enable").classed("highlighted", param === "ocean");
-        });
+        // d3.select("#wind-mode-enable").on("click", function() {
+        //     if (configuration.get("param") !== "wind") {
+        //         configuration.save({param: "wind", surface: "surface", level: "level", overlayType: "default"});
+        //     }
+        // });
+        // configuration.on("change:param", function(x, param) {
+        //     d3.select("#wind-mode-enable").classed("highlighted", param === "wind");
+        // });
+        // d3.select("#ocean-mode-enable").on("click", function() {
+        //     if (configuration.get("param") !== "ocean") {
+        //         // When switching between modes, there may be no associated data for the current date. So we need
+        //         // find the closest available according to the catalog. This is not necessary if date is "current".
+        //         // UNDONE: this code is annoying. should be easier to get date for closest ocean product.
+        //         var ocean = {param: "ocean", surface: "surface", level: "currents", overlayType: "default"};
+        //         var attr = _.clone(configuration.attributes);
+        //         if (attr.date === "current") {
+        //             configuration.save(ocean);
+        //         }
+        //         else {
+        //             when.all(products.productsFor(_.extend(attr, ocean))).spread(function(product) {
+        //                 if (product.date) {
+        //                     configuration.save(_.extend(ocean, µ.dateToConfig(product.date)));
+        //                 }
+        //             }).otherwise(report.error);
+        //         }
+        //         stopCurrentAnimation(true);  // cleanup particle artifacts over continents
+        //     }
+        // });
+        // configuration.on("change:param", function(x, param) {
+        //     d3.select("#ocean-mode-enable").classed("highlighted", param === "ocean");
+        // });
 
         // Add logic to disable buttons that are incompatible with each other.
-        configuration.on("change:overlayType", function(x, ot) {
-            d3.select("#surface-level").classed("disabled", ot === "air_density" || ot === "wind_power_density");
-        });
-        configuration.on("change:surface", function(x, s) {
-            d3.select("#overlay-air_density").classed("disabled", s === "surface");
-            d3.select("#overlay-wind_power_density").classed("disabled", s === "surface");
-        });
+        // configuration.on("change:overlayType", function(x, ot) {
+        //     d3.select("#surface-level").classed("disabled", ot === "air_density" || ot === "wind_power_density");
+        // });
+        // configuration.on("change:surface", function(x, s) {
+        //     d3.select("#overlay-air_density").classed("disabled", s === "surface");
+        //     d3.select("#overlay-wind_power_density").classed("disabled", s === "surface");
+        // });
 
-        // Add event handlers for the time navigation buttons.
-        d3.select("#nav-backward-more").on("click", navigate.bind(null, -10));
-        d3.select("#nav-forward-more" ).on("click", navigate.bind(null, +10));
-        d3.select("#nav-backward"     ).on("click", navigate.bind(null, -1));
-        d3.select("#nav-forward"      ).on("click", navigate.bind(null, +1));
-        d3.select("#nav-now").on("click", function() { configuration.save({date: "current", hour: ""}); });
+        // // Add event handlers for the time navigation buttons.
+        // d3.select("#nav-backward-more").on("click", navigate.bind(null, -10));
+        // d3.select("#nav-forward-more" ).on("click", navigate.bind(null, +10));
+        // d3.select("#nav-backward"     ).on("click", navigate.bind(null, -1));
+        // d3.select("#nav-forward"      ).on("click", navigate.bind(null, +1));
+        // d3.select("#nav-now").on("click", function() { configuration.save({date: "current", hour: ""}); });
 
-        d3.select("#option-show-grid").on("click", function() {
-            configuration.save({showGridPoints: !configuration.get("showGridPoints")});
-        });
-        configuration.on("change:showGridPoints", function(x, showGridPoints) {
-            d3.select("#option-show-grid").classed("highlighted", showGridPoints);
-        });
+        // d3.select("#option-show-grid").on("click", function() {
+        //     configuration.save({showGridPoints: !configuration.get("showGridPoints")});
+        // });
+        // configuration.on("change:showGridPoints", function(x, showGridPoints) {
+        //     d3.select("#option-show-grid").classed("highlighted", showGridPoints);
+        // });
 
         // Add handlers for all wind level buttons.
-        d3.selectAll(".surface").each(function() {
-            var id = this.id, parts = id.split("-");
-            bindButtonToConfiguration("#" + id, {param: "wind", surface: parts[0], level: parts[1]});
-        });
+        // d3.selectAll(".surface").each(function() {
+        //     var id = this.id, parts = id.split("-");
+        //     bindButtonToConfiguration("#" + id, {param: "wind", surface: parts[0], level: parts[1]});
+        // });
 
         // Add handlers for ocean animation types.
         bindButtonToConfiguration("#animate-currents", {param: "ocean", surface: "surface", level: "currents"});
