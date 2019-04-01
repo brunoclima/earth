@@ -133,11 +133,10 @@ var globes = function() {
                 return {
                     move: function(mouse, scale) {
                         if (mouse) {
-                            console.log(startScale)
                             var xd = mouse[0] - startMouse[0] + rotation[0];
                             var yd = mouse[1] - startMouse[1] + rotation[1];
                             projection.rotate([xd * sensitivity, projection.rotate()[1], projection.rotate()[2]]);
-                            projection.translate([projection.translate()[0], projection.translate()[1]])
+                            projection.translate([projection.translate()[0], translation[1] + yd])
                         }
                         projection.scale(scale);
                     },
