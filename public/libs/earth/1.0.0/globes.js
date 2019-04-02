@@ -19,7 +19,7 @@ var globes = function() {
     }
 
     function ensureNumber(num, fallback) {
-        return _.isFinite(num) || num === Infinity || num === -Infinity ? num : fallback;
+        return Number.isFinite(num) || num === Infinity || num === -Infinity ? num : fallback;
     }
 
     /**
@@ -109,7 +109,7 @@ var globes = function() {
                         [-λ, -φ, rotate[2]] :
                         this.newProjection(view).rotate());
                     this.fit(view);
-                    projection.translate(this.center(view));
+                    // projection.translate(this.center(view)); // This resets the projectionstranslation
                     return this;
                 }
                 return [(-rotate[0]).toFixed(2), (-rotate[1]).toFixed(2), Math.round(projection.scale())].join(",");
@@ -349,6 +349,18 @@ var globes = function() {
     //     });
     // }
 
+    console.log(d3.map({
+        // atlantis: atlantis,
+        // azimuthal_equidistant: azimuthalEquidistant,
+        // conic_equidistant: conicEquidistant,
+        equirectangular: equirectangular,
+        mercator: mercator,
+        orthographic: orthographic,
+        // stereographic: stereographic,
+        // waterman: waterman,
+        // winkel3: winkel3
+    }));
+
     return d3.map({
         // atlantis: atlantis,
         // azimuthal_equidistant: azimuthalEquidistant,
@@ -360,5 +372,4 @@ var globes = function() {
         // waterman: waterman,
         // winkel3: winkel3
     });
-
 }();

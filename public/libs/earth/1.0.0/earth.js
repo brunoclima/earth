@@ -156,12 +156,13 @@
                 op = null;  // the drag/zoom/click operation is over
             }).scaleExtent([1, Infinity]);
 
-        var signalEnd = _.debounce(function() {
-            if (!op || op.type !== "drag" && op.type !== "zoom") {
-                configuration.save({orientation: globe.orientation()}, {source: "moveEnd"});
-                dispatch.trigger("moveEnd");
+        var signalEnd = () => {
+            window.setTimeout(function() {
+                if (!op || op.type !== "drag" && op.type !== "zoom") {
+                    configuration.save({orientation: globe.orientation()}, {source: "moveEnd"});
+                    dispatch.trigger("moveEnd");
             }
-        }, MOVE_END_WAIT);  // wait for a bit to decide if user has stopped moving the globe
+        }, MOVE_END_WAIT);}  // wait for a bit to decide if user has stopped moving the globe
 
         d3.select("#display").call(zoom);
         // d3.select("#show-location").on("click", function() {

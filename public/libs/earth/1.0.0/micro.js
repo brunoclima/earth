@@ -462,7 +462,8 @@ var µ = function() {
         }
 
         var value = initial;
-        var runTask_debounced = _.debounce(runTask, 0);  // ignore multiple simultaneous submissions--reduces noise
+        // ignore multiple simultaneous submissions--reduces noise
+        var runTask_debounced = _.debounce(runTask, 0);
         var agent = {
 
             /**

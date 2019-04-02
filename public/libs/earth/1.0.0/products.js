@@ -679,8 +679,8 @@ var products = function() {
     }
 
     function productsFor(attributes) {
-        var attr = _.clone(attributes), results = [];
-        _.values(FACTORIES).forEach(function(factory) {
+        var attr = Object.assign({}, attributes), results = [];
+        Object.values(FACTORIES).forEach(function(factory) {
             if (factory.matches(attr)) {
                 results.push(factory.create(attr));
             }
@@ -689,7 +689,7 @@ var products = function() {
     }
 
     return {
-        overlayTypes: d3.set(_.keys(FACTORIES)),
+        overlayTypes: new Set(Object.keys(FACTORIES)),
         productsFor: productsFor
     };
 
